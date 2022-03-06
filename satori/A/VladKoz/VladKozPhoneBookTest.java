@@ -6,7 +6,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class PhoneBookTest {
+public class VladKozTest {
     @Test
     public void addingElementsWithHostileIntent() {
         PhoneBook a = new PhoneBook();
@@ -272,5 +272,4 @@ public class PhoneBookTest {
         pb2.add(g0);
         assertFalse(pb1.equals(pb2));
     }
-
 }
