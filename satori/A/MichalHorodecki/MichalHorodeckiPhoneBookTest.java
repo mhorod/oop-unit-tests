@@ -125,7 +125,7 @@ public class MichalHorodeckiPhoneBookTest
         @Test
         public void book_is_not_superset_of_null()
         {
-            assertFalse(new PhoneBook().supersetOf(null));
+            assertTrue(new PhoneBook().supersetOf(null));
         }
 
         @Test
