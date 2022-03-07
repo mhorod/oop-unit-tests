@@ -26,6 +26,73 @@ public class DominikMatuszekPhoneBookTest {
 
         assertEquals("{\n  111-111-111\n}\n",a.toString());
     }
+    
+    @Test
+    public void adding_book_that_exceeds_capacity_is_incorrect(){
+        var a = new PhoneBook(1);
+        var b = new PhoneBook();
+        b.add("111111111");
+        b.add("222222222");
+        a.add(b);
+        a.add("111111111");
+        assertEquals(1,a.size());
+    }
+
+    @Test
+    public void adding_phonebooks_to_full_phonebook_is_valid(){
+        var a = new PhoneBook(0);
+        var b = new PhoneBook();
+
+        assertTrue(a.isFull());
+
+        a.add(b).add(a);
+
+        assertFalse(a.isEmpty());
+
+        assertEquals("{\n" +
+                "  {\n" +
+                "  }\n" +
+                "  {\n" +
+                "    {\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n",a.toString());
+    }
+
+    @Test
+    public void bad_arguments_for_constructors_should_use_default(){
+        var a = new PhoneBook(null,-5);
+        assertEquals(a.capacity(),10);
+        assertTrue(a.isEmpty());
+        a.add("111111111");
+        var b = new PhoneBook();
+        b.add("111111111");
+        assertTrue(a.equals(b));
+    }
+
+    @Test
+    public void empty_set_is_subset_of_everything(){
+        var a = new PhoneBook();
+        var b = new PhoneBook();
+        assertTrue(a.supersetOf(b));
+        assertTrue(a.subsetOf(b));
+
+        b.add("111111111");
+        assertTrue(a.subsetOf(b));
+
+        var c = new PhoneBook();
+        c.add(b);
+        assertTrue(a.subsetOf(c));
+    }
+
+    @Test
+    public void shouldnt_be_equal_to_other_classes(){
+        var a = new PhoneBook();
+        assertFalse(a.equals(5));
+        assertFalse(a.equals("bulbulator"));
+        assertFalse(a.equals(null));
+    }
+    
 
     @Test
     public void big_to_string_test(){
