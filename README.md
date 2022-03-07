@@ -3,7 +3,7 @@ Repository for sharing unit tests for OOP course
 
 # How to contribute with tests
 
-## git
+## Git
 
 1. If you don't have the repo on your machine:
     1. Fork the repository
