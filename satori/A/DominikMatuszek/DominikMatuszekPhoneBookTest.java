@@ -129,7 +129,6 @@ public class DominikMatuszekPhoneBookTest {
         b.add("111-111-117");
         a.add(b);
 
-        //System.out.println(a);
 
         PhoneBook c = new PhoneBook(1000);
         c.add(a);
@@ -137,7 +136,6 @@ public class DominikMatuszekPhoneBookTest {
 
         a.add(c);
         c.add(a);
-        System.out.println(c);
 
         assertEquals("{\n" +
                 "  {\n" +
