@@ -142,7 +142,12 @@ public class VladKozPhoneBookTest
     public void testISEmptyEmpty(){
         var pb1 = new PhoneBook(0);
         pb1.add(new PhoneBook());
-
+        assertEquals(pb1.toString(), """
+                {
+                  {
+                  }
+                }
+                """);
     }
 
     private String randomTrioString(Random rand)
