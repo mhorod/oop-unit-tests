@@ -93,7 +93,110 @@ public class DominikMatuszekPhoneBookTest {
         assertFalse(a.equals(null));
     }
     
+    @Test
+    public void test_nulls_basic(){
+        PhoneBook a = new PhoneBook();
+        a.add("");
+        a.add((String) null);
 
+        a.add("111111111");
+        a.add("011111111");
+
+        a.changeFormat(null);
+        a.changeFormat(null);
+        a.changeFormat(PhoneBook.NumberFormat.HYPHENED);
+        a.add("22-22-22");
+        a.toString(); //zeby wymusic ewaluacje
+        a.changeFormat(null);
+        a.toString();
+        a.changeFormat(PhoneBook.NumberFormat.DIGITS);
+        a.changeFormat(null);
+
+        assertFalse(a.contains((String) null));
+        assertFalse(a.contains((PhoneBook) null));
+        assertFalse(a.contains(""));
+        assertFalse(a.equals(null));
+        assertFalse(a.subsetOf(null));
+        assertFalse(a.supersetOf(null));
+        assertFalse(a.elementOf(null));
+
+        assertEquals("{\n" +
+                "  111111111\n" +
+                "}\n", a.toString());
+
+    }
+
+    @Test
+    public void test_nulls_constructor(){
+        var b = new PhoneBook(null,-42);
+        assertEquals(b.capacity(),10);
+        b.add("111-111-111");
+        b.add("111111111");
+        assertFalse(b.contains("111-111-111"));
+        assertTrue(b.contains("111111111"));
+    }
+
+    @Test
+    public void test_nulls_null_phonebook_doing_stuff(){
+        var c = new PhoneBook(null);
+        var d = (PhoneBook) null; //buhahahaha
+        c.add(d);
+        assertTrue(c.isEmpty());
+        assertEquals(c.size(),0);
+        c.add(d).add(d).add(d).add(d);
+
+        assertTrue(c.isEmpty());
+        assertFalse(c.supersetOf(d));
+        assertFalse(c.subsetOf(d));
+        assertFalse(c.elementOf(d));
+
+        c.add("222222222");
+        c.changeFormat(PhoneBook.NumberFormat.HYPHENED);
+        c.add("222-222-222");
+        c.changeFormat(null);
+        c.changeFormat(PhoneBook.NumberFormat.DIGITS);
+        assertEquals("{\n" +
+                "  222222222\n" +
+                "}\n",c.toString());
+        assertFalse(c.contains(d));
+
+        assertFalse(c.equals(d));
+    }
+
+    @Test
+    public void test_nulls_null_string(){
+        String nullstr = (String) null;
+        var a = new PhoneBook();
+        a.add(nullstr);
+        a.changeFormat(PhoneBook.NumberFormat.HYPHENED);
+        a.add(nullstr);
+
+        a.add("111-111-111");
+        a.add("222-222-222");
+
+        assertFalse(a.contains(nullstr));
+        assertFalse(a.equals(nullstr));
+    }
+
+    @Test
+    public void empty_string_addition_and_contains(){
+        String testString = "";
+        var a = new PhoneBook();
+        a.add(testString).add(testString).add(testString).add(testString).add(testString);
+        a.changeFormat(PhoneBook.NumberFormat.HYPHENED);
+        a.add(testString).add(testString).add(testString).add(testString).add(testString);
+
+        assertTrue(a.isEmpty());
+        assertFalse(a.contains(testString));
+        a.changeFormat(PhoneBook.NumberFormat.DIGITS);
+        assertFalse(a.contains(testString));
+        assertFalse(a.equals(testString));
+
+        a.add(a).add(a).add(a);
+        assertFalse(a.isEmpty());
+    }
+    
+    
     @Test
     public void big_to_string_test(){
         PhoneBook a = new PhoneBook(1000);
