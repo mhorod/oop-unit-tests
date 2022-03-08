@@ -39,6 +39,15 @@ public class MichalHorodeckiPhoneBookTest
             assertEquals(5, pb.size());
             assertTrue(pb.isFull());
         }
+
+        @Test
+        public void constructor_called_with_invalid_data_uses_default_values()
+        {
+            PhoneBook pb = new PhoneBook(null, -5);
+            assertEquals(10, pb.capacity());
+            pb.add("123456789");
+            assertFalse(pb.isEmpty());
+        }
     }
 
     // Test inclusion relations on phone books and numbers
@@ -83,7 +92,7 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
-        public void book_containing_a_book_of_numbers_contains_those_numbers()
+        public void book_containing_book_of_numbers_contains_those_numbers()
         {
             PhoneBook numbers = new PhoneBook().add("123456789").add("456789012");
             PhoneBook books = new PhoneBook().add(numbers);
@@ -91,6 +100,28 @@ public class MichalHorodeckiPhoneBookTest
             assertTrue(books.contains("456789012"));
         }
 
+        @Test
+        public void book_containing_book_of_numbers_contains_those_numbers_in_changed_format()
+        {
+            PhoneBook numbers = new PhoneBook().add("123456789").add("456789012");
+            PhoneBook books = new PhoneBook().add(numbers);
+            books.changeFormat(PhoneBook.NumberFormat.HYPHENED);
+            assertFalse(books.contains("123456789"));
+            assertFalse(books.contains("456789012"));
+            assertTrue(books.contains("123-456-789"));
+            assertTrue(books.contains("456-789-012"));
+        }
+
+        @Test
+        public void book_containing_book_of_numbers_contains_those_numbers_in_adjusted_format()
+        {
+            PhoneBook numbers = new PhoneBook().add("123456789").add("456789012");
+            PhoneBook books = new PhoneBook(PhoneBook.NumberFormat.HYPHENED).add(numbers);
+            assertFalse(books.contains("123456789"));
+            assertFalse(books.contains("456789012"));
+            assertTrue(books.contains("123-456-789"));
+            assertTrue(books.contains("456-789-012"));
+        }
 
         @Test
         public void book_is_not_element_of_null()
@@ -129,6 +160,15 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
+        public void empty_book_is_its_subset_and_superset()
+        {
+            PhoneBook empty = new PhoneBook();
+            assertTrue(empty.supersetOf(empty));
+            assertTrue(empty.subsetOf(empty));
+        }
+
+
+        @Test
         public void empty_book_is_subset_of_non_empty_book()
         {
             PhoneBook subset = new PhoneBook();
@@ -163,12 +203,38 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
-        public void inclusion_is_not_recursive()
+        public void set_inclusion_is_not_recursive()
         {
             PhoneBook almost_superset = new PhoneBook().add(new PhoneBook().add("123456789"));
             PhoneBook almost_subset = new PhoneBook().add("123456789");
             assertFalse(almost_subset.subsetOf(almost_superset));
             assertFalse(almost_superset.supersetOf(almost_subset));
+        }
+
+        @Test
+        public void containing_books_is_not_recursive()
+        {
+            PhoneBook pb = new PhoneBook().add(new PhoneBook().add(new PhoneBook()).add("123456789"));
+            PhoneBook almost_contained = new PhoneBook().add("123456789");
+            assertFalse(pb.contains(almost_contained));
+        }
+
+        @Test
+        public void nested_inclusion_test()
+        {
+            PhoneBook a = new PhoneBook().add("123456789");
+            PhoneBook b = new PhoneBook().add("223456789");
+            PhoneBook c = new PhoneBook().add("323456789");
+            PhoneBook x = new PhoneBook().add("423456789");
+            PhoneBook y = new PhoneBook().add("523456789");
+
+            PhoneBook abc = new PhoneBook().add(a).add(b).add(c);
+            PhoneBook xy = new PhoneBook().add(x).add(y);
+            PhoneBook first = new PhoneBook().add(abc).add(x);
+            PhoneBook second = new PhoneBook().add(abc).add(xy);
+
+            assertFalse(first.subsetOf(second));
+            assertFalse(second.supersetOf(first));
         }
     }
 
@@ -222,6 +288,14 @@ public class MichalHorodeckiPhoneBookTest
         {
             assertNotEquals(null, new PhoneBook());
         }
+
+        @Test
+        public void containing_equal_numbers_in_subbooks_is_insufficient_to_be_equal()
+        {
+            PhoneBook pb1 = new PhoneBook().add("123456789");
+            PhoneBook pb2 = new PhoneBook().add(new PhoneBook().add("123456789"));
+            assertNotEquals(pb1, pb2);
+        }
     }
 
     // Test if serialization to strings works as expected
@@ -245,10 +319,28 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
+        public void book_with_two_empty_books_added_to_string()
+        {
+            String expected = "{\n  {\n  }\n}\n";
+            String actual = new PhoneBook().add(new PhoneBook()).add(new PhoneBook()).toString();
+            assertEquals(expected, actual);
+        }
+
+
+        @Test
         public void book_string_contains_numbers_in_current_format()
         {
             String expected = "{\n  123-456-789\n}\n";
             PhoneBook pb = new PhoneBook().add("123456789");
+            pb.changeFormat(PhoneBook.NumberFormat.HYPHENED);
+            assertEquals(expected, pb.toString());
+        }
+
+        @Test
+        public void subbooks_string_contains_numbers_in_current_format()
+        {
+            String expected = "{\n  {\n    123-456-789\n  }\n}\n";
+            PhoneBook pb = new PhoneBook().add(new PhoneBook().add("123456789"));
             pb.changeFormat(PhoneBook.NumberFormat.HYPHENED);
             assertEquals(expected, pb.toString());
         }
@@ -289,6 +381,22 @@ public class MichalHorodeckiPhoneBookTest
             pb.add(new PhoneBook());
             assertEquals(0, pb.size());
         }
+
+        @Test
+        public void book_with_capacity_of_zero_is_not_empty_after_adding_empty_book()
+        {
+            PhoneBook pb = new PhoneBook(0);
+            pb.add(new PhoneBook());
+            assertFalse(pb.isEmpty());
+        }
+
+        @Test
+        public void book_with_capacity_of_zero_is_empty_after_adding_number()
+        {
+            PhoneBook pb = new PhoneBook(0);
+            pb.add("123456789");
+            assertTrue(pb.isEmpty());
+        }
     }
 
     // Test how adding various data affects size of a book
@@ -328,6 +436,7 @@ public class MichalHorodeckiPhoneBookTest
             pb.add("1-234-56789");  // Hyphens in invalid places
             pb.add("-1-2-3-4-5-6-7-8-9-"); // Invalid number of hyphens
             pb.add("12-45-789");  // Invalid  number of digits
+            pb.add("012-345-678"); // Hyphened number cannot start with 0
 
             assertEquals(0, pb.size());
         }
@@ -432,12 +541,44 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
-        public void addding_existing_book_does_not_change_size()
+        public void adding_existing_book_does_not_change_size()
         {
             PhoneBook books = new PhoneBook();
             PhoneBook pb = new PhoneBook().add("123456789");
             books.add(pb).add(pb);
             assertEquals(1, pb.size());
+        }
+
+        @Test
+        public void can_add_at_most_ten_numbers()
+        {
+            PhoneBook pb = new PhoneBook(20);
+            for (int i = 0; i < 20; i++)
+                pb.add(String.format("1234567%02d", i));
+            assertEquals(10, pb.size());
+        }
+
+        @Test
+        public void can_add_at_most_ten_books()
+        {
+            PhoneBook pb = new PhoneBook(20);
+            for (int i = 0; i < 10; i++)
+                pb.add(pb);
+            // pb contains ten books without any numbers
+            // If the below was added the size would equal ten
+            pb.add(new PhoneBook().add("123456789"));
+            assertEquals(0, pb.size());
+        }
+
+        @Test
+        public void capacity_can_exceed_ten()
+        {
+            PhoneBook pb = new PhoneBook(32);
+            PhoneBook content = new PhoneBook().add("123456789");
+            pb.add(content);
+            for (int i = 0; i < 5; i++) // Double the size with each iteration
+                pb.add(pb);
+            assertEquals(32, pb.size());
         }
     }
 
