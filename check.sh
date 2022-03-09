@@ -60,4 +60,10 @@ do
   fi
 done
 
+if [ ${exit_code} -ne 0 ]; then
+  echo "Project build failed."
+else
+  echo "Project build succeeded";
+fi
+
 exit ${exit_code}
