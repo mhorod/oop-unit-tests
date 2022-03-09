@@ -17,7 +17,7 @@ Repository for sharing unit tests for OOP course
         2. Execute `git pull upstream main` to sync changes
     - If you commited your changes rebase instead of merging:
         1. `git fetch`
-        2. `git rebase origin main`
+        2. `git rebase origin/main`
         
 3. Create branch for your changes and switch to it
     1. `git branch {branch_name}`
