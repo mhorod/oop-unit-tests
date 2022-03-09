@@ -391,6 +391,14 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
+        public void book_with_capacity_of_zero_is_not_empty_after_adding_non_empty_book()
+        {
+            PhoneBook pb = new PhoneBook(0);
+            pb.add(new PhoneBook().add("123456789"));
+            assertTrue(pb.isEmpty());
+        }
+
+        @Test
         public void book_with_capacity_of_zero_is_empty_after_adding_number()
         {
             PhoneBook pb = new PhoneBook(0);
@@ -550,12 +558,12 @@ public class MichalHorodeckiPhoneBookTest
         }
 
         @Test
-        public void can_add_at_most_ten_numbers()
+        public void can_add_more_that_ten_numbers()
         {
             PhoneBook pb = new PhoneBook(20);
             for (int i = 0; i < 20; i++)
                 pb.add(String.format("1234567%02d", i));
-            assertEquals(10, pb.size());
+            assertEquals(20, pb.size());
         }
 
         @Test
@@ -579,6 +587,19 @@ public class MichalHorodeckiPhoneBookTest
             for (int i = 0; i < 5; i++) // Double the size with each iteration
                 pb.add(pb);
             assertEquals(32, pb.size());
+        }
+
+        @Test
+        public void adding_book_containing_many_empty_books_increases_size()
+        {
+            PhoneBook pb = new PhoneBook(1);
+            PhoneBook empty_books = new PhoneBook();
+            for (int i = 0; i < 10; i++)
+                empty_books.add(empty_books);
+            PhoneBook number = new PhoneBook().add("123456789");
+            PhoneBook added = new PhoneBook().add(empty_books).add(number);
+            pb.add(added);
+            assertEquals(1, pb.size());
         }
     }
 
