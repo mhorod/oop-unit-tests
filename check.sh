@@ -47,6 +47,7 @@ check-task() {
     echo "Test build for task ${task} succeeded."
   fi
   cleanup-test ${task}
+  echo ""
 
   return ${exec_exit_code}
 }
