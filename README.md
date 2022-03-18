@@ -27,6 +27,7 @@ Repository for sharing unit tests for OOP course
     Don't create new directories there.
 
 5. Make sure your tests compile by executing `bash check.sh`
+    - note: you can build a single task by providing the task name as an argument, e.g. `bash check.sh A`
 6. Commit your changes and push them
 7. Go to your repository on Github and create a pull request
 

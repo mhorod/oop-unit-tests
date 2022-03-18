@@ -52,19 +52,29 @@ check-task() {
   return ${exec_exit_code}
 }
 
-exit_code=0;
-for task in $(ls .tasks/satori) 
-do
-  check-task satori/${task}
-  if [ $? -ne 0 ]; then
-    exit_code=1
-  fi
-done
+check-all()  {
+  exit_code=0;
+  for task in $(ls .tasks/satori) 
+  do
+    check-task satori/${task}
+    if [ $? -ne 0 ]; then
+      exit_code=1
+    fi
+  done
 
-if [ ${exit_code} -ne 0 ]; then
-  echo "Project build failed."
+  if [ ${exit_code} -ne 0 ]; then
+    echo "Project build failed."
+  else
+    echo "Project build succeeded";
+  fi
+
+  exit ${exit_code}
+}
+
+
+if [ -n "${1}" ]; then
+  check-task satori/${1}
 else
-  echo "Project build succeeded";
+  check-all
 fi
 
-exit ${exit_code}
