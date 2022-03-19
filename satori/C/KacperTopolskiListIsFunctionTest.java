@@ -62,6 +62,28 @@ public class KacperTopolskiListIsFunctionTest {
 
         }
         @Test
+        public void clear_works_correctly() {
+            ListIsFunction f = new ListIsFunction();
+            List l = f.asList();
+            Map m = f.asMap();
+
+            l.add(1);
+            assertFalse(l.isEmpty());
+            assertFalse(m.isEmpty());
+
+            m.clear();
+            assertTrue(l.isEmpty());
+            assertTrue(m.isEmpty());
+
+            m.put(0, 1);
+            assertFalse(l.isEmpty());
+            assertFalse(m.isEmpty());
+
+            l.clear();
+            assertTrue(l.isEmpty());
+            assertTrue(m.isEmpty());
+        }
+        @Test(timeout = 250)
         public void size_is_unbounded() {
             ListIsFunction f = new ListIsFunction();
             for (int i = 0; i < 12345; ++i) {
@@ -97,7 +119,7 @@ public class KacperTopolskiListIsFunctionTest {
             assertTrue(f.asMap().isEmpty());
         }
         @Test
-        public void map_remove_outside_of_bound_does_nothing() {
+        public void map_remove_out_of_bounds_does_nothing() {
             ListIsFunction f = new ListIsFunction();
             f.asList().add("aaa");
             f.asList().add("bbb");
@@ -140,24 +162,28 @@ public class KacperTopolskiListIsFunctionTest {
 
             try {
                 f.asMap().remove(0);
-                fail("No exception!");
+                fail("map can't remove in the middle");
             } catch(Exception e) {
                 assertEquals(java.lang.IllegalArgumentException.class, e.getClass());
+                assertEquals("java.lang.IllegalArgumentException", e.toString());
+
                 assertEquals(3, f.asMap().size());
             }
 
             try {
                 f.asMap().remove(1);
-                fail("No exception!");
+                fail("map can't remove in the middle");
             } catch(Exception e) {
                 assertEquals(java.lang.IllegalArgumentException.class, e.getClass());
+                assertEquals("java.lang.IllegalArgumentException", e.toString());
+
                 assertEquals(3, f.asList().size());
             }
         }
     }
     public static class MapPutTest {
         @Test
-        public void map_put_strange_values() {
+        public void map_put_works_with_strange_values() {
             ListIsFunction f = new ListIsFunction();
 
             f.asMap().put(0, "");
@@ -170,7 +196,7 @@ public class KacperTopolskiListIsFunctionTest {
             assertEquals(3, f.asMap().size());
         }
         @Test
-        public void map_put_replace_strange_values() {
+        public void map_put_replace_works_with_strange_values() {
             ListIsFunction f = new ListIsFunction();
 
             assertNull(f.asMap().put(0, ""));
@@ -195,47 +221,101 @@ public class KacperTopolskiListIsFunctionTest {
             try {
                 f.asMap().put(null, "in");
                 fail("null key should result in exception");
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 assertEquals(java.lang.NullPointerException.class, e.getClass());
+                assertEquals("java.lang.NullPointerException", e.toString());
+
+                assertEquals(5, f.asList().size());
             }
 
             try {
                 f.asMap().put("2", "in");
                 fail("non-integer key should result in exception");
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 assertEquals(java.lang.ClassCastException.class, e.getClass());
+                assertEquals("java.lang.ClassCastException", e.toString());
+
+                assertEquals(5, f.asMap().size());
             }
 
             try {
                 f.asMap().put(new Object(), "in");
                 fail("non-integer key should result in exception");
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 assertEquals(java.lang.ClassCastException.class, e.getClass());
+                assertEquals("java.lang.ClassCastException", e.toString());
+
+                assertEquals(5, f.asList().size());
             }
 
             try {
                 f.asMap().put(-1, "in");
                 fail("negative key should result in exception");
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 assertEquals(java.lang.IllegalArgumentException.class, e.getClass());
+                assertEquals("java.lang.IllegalArgumentException", e.toString());
+
+                assertEquals(5, f.asMap().size());
             }
 
             try {
                 f.asMap().put(6, "in");
                 fail("too big key should result in exception");
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 assertEquals(java.lang.IllegalArgumentException.class, e.getClass());
+                assertEquals("java.lang.IllegalArgumentException", e.toString());
+
+                assertEquals(5, f.asList().size());
             }
 
             assertEquals("[0, 1, 2, 3, 4]", f.asList().toString());
         }
     }
     public static class MapEntrySetTest {
+        @Test
+        public void entry_set_is_a_view() {
+            ListIsFunction f = new ListIsFunction();
+            Set es = f.asMap().entrySet();
+            Set ks = f.asMap().keySet();
+
+            assertEquals(0, es.size());
+            assertTrue(es.isEmpty());
+            assertEquals("[]", es.toString());
+
+            assertEquals(0, ks.size());
+            assertTrue(ks.isEmpty());
+            assertEquals("[]", ks.toString());
+
+            f.asList().add(13);
+
+            assertEquals(1, es.size());
+            assertFalse(es.isEmpty());
+            assertEquals("[0=13]", es.toString());
+
+            assertEquals(1, ks.size());
+            assertFalse(ks.isEmpty());
+            assertEquals("[0]", ks.toString());
+
+            f.asList().add("test");
+
+            assertEquals(2, es.size());
+            assertFalse(es.isEmpty());
+            assertEquals("[0=13, 1=test]", es.toString());
+
+            assertEquals(2, ks.size());
+            assertFalse(ks.isEmpty());
+            assertEquals("[0, 1]", ks.toString());
+
+            f.asList().clear();
+
+            assertEquals(0, es.size());
+            assertTrue(es.isEmpty());
+            assertEquals("[]", es.toString());
+
+            assertEquals(0, ks.size());
+            assertTrue(ks.isEmpty());
+            assertEquals("[]", ks.toString());
+        }
         @Test
         public void entry_set_returns_correct_set() {
             ListIsFunction f = new ListIsFunction();
@@ -245,41 +325,54 @@ public class KacperTopolskiListIsFunctionTest {
             Set s_ret = f.asMap().entrySet();
 
             Set s_ex = new HashSet();
-            s_ex.add(Map.entry(0, "()"));
-            s_ex.add(Map.entry(1, 1));
-            s_ex.add(Map.entry(2, 'c'));
+            s_ex.add(new AbstractMap.SimpleEntry(0, "()"));
+            s_ex.add(new AbstractMap.SimpleEntry(1, 1));
+            s_ex.add(new AbstractMap.SimpleEntry(2, 'c'));
 
             assertEquals(s_ex, s_ret);
             assertEquals("[(), 1, c]", f.asList().toString());
             assertEquals(3, f.asList().size());
         }
         @Test
+        public void entry_set_works_with_strange_values() {
+            ListIsFunction f = new ListIsFunction();
+            Set s = f.asMap().entrySet();
+
+            f.asList().add(null);
+            f.asList().add("");
+
+            assertEquals("[0=null, 1=]", s.toString());
+            assertEquals(2, s.size());
+
+            f.asList().add(new Object());
+            assertEquals(3, s.size());
+        }
+    }
+    public static class MapEntrySetIteratorTest {
+        @Test
         public void entry_set_iterator_next() {
             ListIsFunction f = new ListIsFunction();
-            f.asList().add("()");
-            f.asList().add(1);
-            f.asList().add('c');
+            f.asList().add(-1);
+            f.asList().add(null);
             Iterator it = f.asMap().entrySet().iterator();
 
             assertTrue(it.hasNext());
-            assertEquals(it.next(), Map.entry(0, "()"));
+            assertEquals(it.next(), new AbstractMap.SimpleEntry(0, -1));
 
             assertTrue(it.hasNext());
-            assertEquals(it.next(), Map.entry(1, 1));
-
-            assertTrue(it.hasNext());
-            assertEquals(it.next(), Map.entry(2, 'c'));
+            assertEquals(it.next(), new AbstractMap.SimpleEntry(1, null));
 
             assertFalse(it.hasNext());
             try {
                 it.next();
-                fail("No exception!");
+                fail("there is no next element");
             } catch(Exception e) {
                 assertEquals(java.util.NoSuchElementException.class, e.getClass());
+                assertEquals("java.util.NoSuchElementException", e.toString());
             }
 
-            assertEquals("[(), 1, c]", f.asList().toString());
-            assertEquals(3, f.asList().size());
+            assertEquals("[-1, null]", f.asList().toString());
+            assertEquals(2, f.asList().size());
         }
         @Test
         public void entry_set_iterator_remove_first_throws() {
@@ -291,9 +384,10 @@ public class KacperTopolskiListIsFunctionTest {
 
             try {
                 it.remove();
-                fail("No exception!");
+                fail("remove() has to be called after next()");
             } catch(Exception e) {
                 assertEquals(java.lang.IllegalStateException.class, e.getClass());
+                assertEquals("java.lang.IllegalStateException", e.toString());
             }
 
             assertEquals("[(), 1, c]", f.asList().toString());
@@ -312,9 +406,10 @@ public class KacperTopolskiListIsFunctionTest {
 
             try {
                 it.remove();
-                fail("No exception!");
+                fail("map iterator can't remove in the middle");
             } catch(Exception e) {
                 assertEquals(java.lang.IllegalStateException.class, e.getClass());
+                assertEquals("java.lang.IllegalStateException", e.toString());
             }
 
             assertEquals("[(), 1, c]", f.asList().toString());
@@ -350,9 +445,10 @@ public class KacperTopolskiListIsFunctionTest {
             it.remove();
             try {
                 it.remove();
-                fail("No exception!");
+                fail("map iterator can't remove twice");
             } catch(Exception e) {
                 assertEquals(java.lang.IllegalStateException.class, e.getClass());
+                assertEquals("java.lang.IllegalStateException", e.toString());
             }
 
             assertEquals("[(), 1]", f.asList().toString());
