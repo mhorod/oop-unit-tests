@@ -1,6 +1,8 @@
 # oop-unit-tests
 Repository for sharing unit tests for OOP course
 
+There is `clone.sh` bash script available which clones skeleton and tests for a task. Usage: `./clone.sh {task} {dest}` - creates `{task}` directory in `{dest}`
+
 # How to contribute with tests
 
 ## Git

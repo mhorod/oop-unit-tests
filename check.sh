@@ -1,3 +1,5 @@
+#!/bin/bash
+
 init-test() {
   task=${1}
   echo "Copying tests into .tasks/${task}/src/test/java/"
