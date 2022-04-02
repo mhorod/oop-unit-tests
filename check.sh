@@ -36,9 +36,17 @@ check-task() {
   if [ ! -d ${task} ]; then 
     echo "No tests for ${task} found. Skipping."
     exit 0
-  else
-    echo "Running tests for task ${task}"
   fi
+
+  if grep ${task} .checkignore; then
+    echo "Task ${task} is set to be ignored. Skipping."
+    echo ""
+    return 0
+  fi
+
+  echo "Running tests for task ${task}"
+
+
   
   init-test ${task}
   execute-test ${task}
