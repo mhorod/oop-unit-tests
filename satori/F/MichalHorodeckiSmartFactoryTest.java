@@ -476,9 +476,9 @@ public class MichalHorodeckiSmartFactoryTest
         {
             MockInterface proxy = SmartFactory.fixIt(MockInterface.class, null);
             ContainsArray x = proxy.contains_array();
-            assertNotNull(x.a);
-            assertSame(x.a, x.b);
-            assertSame(x.a, x.c);
+            assertNull(x.a);
+            assertNull(x.b);
+            assertNull(x.c);
         }
 
         @Test
@@ -487,7 +487,7 @@ public class MichalHorodeckiSmartFactoryTest
             MockInterface proxy = SmartFactory.fixIt(MockInterface.class, null);
             InitializedFields x = proxy.initialized_fields();
             assertNotEquals(x.initialized_array, x.uninitialized_array);
-            assertNotEquals(x.initialized_array, x.uninitialized_array);
+            assertNotEquals(x.initialized_string, x.uninitialized_string);
         }
 
         @Test
