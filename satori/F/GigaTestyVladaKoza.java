@@ -14,7 +14,7 @@ public class GigaTestyVladaKoza {
     }
 
     @Test
-    public void returnTypeArgumentsAndErrors_can_be_casted() {
+    public void return_type_arguments_and_errors_can_be_casted() {
         Interface proxy = SmartFactory.fixIt(Interface.class, new Class());
         try {
             assertEquals(proxy.foo("42"), "42");
@@ -38,7 +38,7 @@ public class GigaTestyVladaKoza {
     }
 
     @Test
-    public void too_many_good_functions_frows_hello() throws Exception {
+    public void too_many_good_functions_throws_hello() throws Exception {
         Interface2 proxy = SmartFactory.fixIt(Interface2.class, new Class2());
         try {
             proxy.foo(4);
