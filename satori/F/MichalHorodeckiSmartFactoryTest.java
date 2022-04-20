@@ -341,6 +341,7 @@ public class MichalHorodeckiSmartFactoryTest
             InitializedFields initialized_fields();
             CycleA cycle();
             InheritingFields inheriting_fields();
+            ComposingInheritingFields composing_inheriting_fields();
             InheritingFieldsWithPrivateConstructors inheriting_fields_with_private_constructors();
             StaticFields static_fields();
             ThrowingConstructor throwing_constructor();
@@ -389,6 +390,29 @@ public class MichalHorodeckiSmartFactoryTest
             DerivedDerived derivedDerived;
         }
 
+        static class ComposingInheritingFields
+        {
+            static class Base { }
+
+            static class Derived extends Base { }
+
+
+            static class DerivedDerived extends Derived { }
+
+            static class DerivedDerivedWrapper
+            {
+                DerivedDerived derivedDerived;
+            }
+
+
+            // Initializing in this order will create three different objects
+            // Correct implementation initializes derivedDerived first
+            // i.e. it should traverse all composition levels
+            Base base;
+            Derived derived;
+            DerivedDerivedWrapper derivedDerivedWrapper;
+        }
+
 
         // Similar example as above, but all classes have private constructors
         // which forces taking already initialized bottom class
@@ -413,7 +437,6 @@ public class MichalHorodeckiSmartFactoryTest
             Base base;
             Derived derived;
             DerivedDerived derivedDerived = new DerivedDerived();
-
         }
 
         static class StaticFields
@@ -506,6 +529,15 @@ public class MichalHorodeckiSmartFactoryTest
             InheritingFields x = proxy.inheriting_fields();
             assertEquals(x.base, x.derived);
             assertEquals(x.derived, x.derivedDerived);
+        }
+
+        @Test
+        public void composed_inheriting_fields_reference_the_same_object()
+        {
+            MockInterface proxy = SmartFactory.fixIt(MockInterface.class, null);
+            ComposingInheritingFields x = proxy.composing_inheriting_fields();
+            assertEquals(x.base, x.derived);
+            assertEquals(x.derived, x.derivedDerivedWrapper.derivedDerived);
         }
 
         @Test
