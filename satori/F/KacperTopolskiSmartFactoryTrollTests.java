@@ -1,4 +1,5 @@
 import org.junit.Test;
+import org.junit.Ignore;
 
 import static org.junit.Assert.*;
 
@@ -18,6 +19,7 @@ public class KacperTopolskiSmartFactoryTrollTests {
     interface X {
         C f();
     }
+    @Ignore
     @Test
     public void troll1() {
         C c = SmartFactory.fixIt(X.class, null).f();
@@ -25,7 +27,7 @@ public class KacperTopolskiSmartFactoryTrollTests {
 
     static class D1 {
         public E1 e;
-        F f;
+        public F f;
         public D1() {
 
         }
@@ -57,7 +59,7 @@ public class KacperTopolskiSmartFactoryTrollTests {
         }
     }
     static class F {
-        boolean bool;
+        public boolean bool;
         public F() {
             bool = false;
         }
@@ -69,6 +71,8 @@ public class KacperTopolskiSmartFactoryTrollTests {
         D1 d1();
         D2 d2();
     }
+
+    @Ignore
     @Test
     public void troll2() {
         Y y = SmartFactory.fixIt(Y.class, null);
