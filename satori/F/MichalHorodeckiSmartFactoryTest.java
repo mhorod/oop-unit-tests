@@ -342,11 +342,8 @@ public class MichalHorodeckiSmartFactoryTest
             CycleA cycle();
             InheritingFields inheriting_fields();
             ComposingInheritingFields composing_inheriting_fields();
-            InheritingFieldsWithPrivateConstructors inheriting_fields_with_private_constructors();
             StaticFields static_fields();
             ThrowingConstructor throwing_constructor();
-            MemberWithPrivateConstructor member_with_private_constructor();
-            StaticFieldWithPrivateConstructor static_field_with_private_constructor();
         }
 
         static class ContainsArray
@@ -367,39 +364,38 @@ public class MichalHorodeckiSmartFactoryTest
 
         static class CycleA
         {
-            CycleB next;
+            public CycleB next;
         }
 
         static class CycleB
         {
-            CycleA next;
+            public CycleA next;
         }
 
         static class InheritingFields
         {
-            static class Base { }
+            public static class Base { }
 
-            static class Derived extends Base { }
+            public static class Derived extends Base { }
 
-            static class DerivedDerived extends Derived { }
+            public static class DerivedDerived extends Derived { }
 
 
             // Initializing in this order will create three different objects
-            Base base;
-            Derived derived;
-            DerivedDerived derivedDerived;
+            public Base base;
+            public Derived derived;
+            public DerivedDerived derivedDerived;
         }
 
         static class ComposingInheritingFields
         {
-            static class Base { }
+            public static class Base { }
 
-            static class Derived extends Base { }
+            public static class Derived extends Base { }
 
+            public static class DerivedDerived extends Derived { }
 
-            static class DerivedDerived extends Derived { }
-
-            static class DerivedDerivedWrapper
+            public static class DerivedDerivedWrapper
             {
                 DerivedDerived derivedDerived;
             }
@@ -408,41 +404,16 @@ public class MichalHorodeckiSmartFactoryTest
             // Initializing in this order will create three different objects
             // Correct implementation initializes derivedDerived first
             // i.e. it should traverse all composition levels
-            Base base;
-            Derived derived;
-            DerivedDerivedWrapper derivedDerivedWrapper;
+            public Base base;
+            public Derived derived;
+            public DerivedDerivedWrapper derivedDerivedWrapper;
         }
 
-
-        // Similar example as above, but all classes have private constructors
-        // which forces taking already initialized bottom class
-        static class InheritingFieldsWithPrivateConstructors
-        {
-            static class Base
-            {
-                private Base() { }
-            }
-
-            static class Derived extends Base
-            {
-                private Derived() { }
-            }
-
-            static class DerivedDerived extends Derived
-            {
-                private DerivedDerived() { }
-            }
-
-            // Initializing in this order will throw an exception
-            Base base;
-            Derived derived;
-            DerivedDerived derivedDerived = new DerivedDerived();
-        }
 
         static class StaticFields
         {
-            static Object uninitialized;
-            static Object initialized = new Object();
+            public static Object uninitialized;
+            public static Object initialized = new Object();
         }
 
         static class ThrowingConstructor
@@ -451,32 +422,6 @@ public class MichalHorodeckiSmartFactoryTest
             {
                 throw new RuntimeException("hahaha");
             }
-        }
-
-        static class MemberWithPrivateConstructor
-        {
-            static class PrivateConstructor
-            {
-                private PrivateConstructor() { }
-            }
-
-            static class PublicConstructor
-            {
-                PrivateConstructor obj = new PrivateConstructor();
-            }
-
-            PrivateConstructor privateConstructor;
-            PublicConstructor publicConstructor;
-        }
-
-        static class StaticFieldWithPrivateConstructor
-        {
-            static class PrivateConstructor
-            {
-                private PrivateConstructor() { }
-            }
-
-            static PrivateConstructor pc;
         }
 
 
