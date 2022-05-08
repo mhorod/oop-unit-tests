@@ -1,9 +1,7 @@
-import org.junit.jupiter.api.Test;
-
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.StringReader;
-
 import static java.lang.Thread.sleep;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LeonidDorochkoTest {
     static class OurRunnable implements Runnable {
